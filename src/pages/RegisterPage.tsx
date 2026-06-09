@@ -1,4 +1,5 @@
 import { createUser, getUserByEmail } from '../api/usersApi';
+import Button from '../components/ui/Button.tsx';
 import type { User } from '../types/users.tsx';
 import confetti from 'canvas-confetti';
 import { useState } from 'react';
@@ -68,11 +69,7 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
         onChange={(event) => setEmail(event.target.value)}
       />
       {status === 'error' && <p className="text-red-500">Something went wrong. Please try again.</p>}
-      <button
-        className="flex h-12 w-36 items-center justify-center rounded-lg bg-indigo-600 text-sm text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
-        onClick={handleSubmit}
-        disabled={status === 'loading' || status === 'success'}
-      >
+      <Button onClick={handleSubmit} disabled={status === 'loading' || status === 'success'}>
         <span className="flex items-center gap-1">
           {status === 'loading' || status === 'success' ? (
             <>
@@ -86,7 +83,7 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
             'Sign up'
           )}
         </span>
-      </button>
+      </Button>
       <button
         className="text-indigo-600 underline"
         onClick={() => {

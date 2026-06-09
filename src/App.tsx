@@ -10,11 +10,15 @@ function App() {
     setCurrentUser(user);
   }
 
+  function handleLogout() {
+    setCurrentUser(null);
+  }
+
   if (!currentUser) {
     return <RegisterPage onAuthSuccess={handleAuthSuccess} />;
   }
 
-  return <UsersPage currentUser={currentUser} />;
+  return <UsersPage currentUser={currentUser} onLogout={handleLogout} />;
 }
 
 export default App;

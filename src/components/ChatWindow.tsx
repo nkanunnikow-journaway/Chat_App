@@ -3,6 +3,7 @@ import { createMessage, getMessages } from '../api/messagesApi.tsx';
 import type { Chat } from '../types/chats.tsx';
 import type { Message } from '../types/messages.tsx';
 import type { User } from '../types/users.tsx';
+import Button from './ui/Button.tsx';
 import { useState, useEffect } from 'react';
 
 type ChatWindowProps = {
@@ -113,13 +114,7 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
             value={messageText}
             onChange={(event) => setMessageText(event.target.value)}
           />
-
-          <button
-            className="rounded-xl bg-indigo-600 px-6 py-3 text-white hover:bg-indigo-700"
-            onClick={handleSendMessage}
-          >
-            Senden
-          </button>
+          <Button onClick={handleSendMessage}>Senden</Button>
         </div>
       </footer>
     </main>

@@ -1,13 +1,15 @@
 import { getUsers, searchUsersByName } from '../api/usersApi.tsx';
 import type { User } from '../types/users.tsx';
+import Button from './ui/Button.tsx';
 import { useState, useEffect } from 'react';
 
 type UserListProps = {
   selectedUser: User | null;
   onSelectUser: (user: User) => void;
+  onLogout: () => void;
 };
 
-function UserList({ selectedUser, onSelectUser }: UserListProps) {
+function UserList({ selectedUser, onSelectUser, onLogout }: UserListProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -45,7 +47,7 @@ function UserList({ selectedUser, onSelectUser }: UserListProps) {
     loadUsers();
   }, []);
   return (
-    <aside className="w-80 border-r border-gray-200 bg-white">
+    <aside className="w-80 border-r border-gray-200 bg-white flex flex-col justify-between">
       <div className="p-4">
         <input
           className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-indigo-500"
@@ -74,6 +76,9 @@ function UserList({ selectedUser, onSelectUser }: UserListProps) {
             </div>
           </button>
         ))}
+      </div>
+      <div className="p-4">
+        <Button onClick={onLogout}>Logout</Button>
       </div>
     </aside>
   );
