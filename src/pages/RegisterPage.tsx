@@ -71,17 +71,15 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
       <button
         className="flex h-12 w-36 items-center justify-center rounded-lg bg-indigo-600 text-sm text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-70"
         onClick={handleSubmit}
-        disabled={status === 'loading'}
+        disabled={status === 'loading' || status === 'success'}
       >
         <span className="flex items-center gap-1">
-          {status === 'loading' ? (
+          {status === 'loading' || status === 'success' ? (
             <>
               <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400 [animation-delay:-0.3s]" />
               <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400 [animation-delay:-0.15s]" />
               <div className="h-2 w-2 animate-bounce rounded-full bg-indigo-400" />
             </>
-          ) : status === 'success' ? (
-            'Success!'
           ) : isLoginMode ? (
             'Sign in'
           ) : (
