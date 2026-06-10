@@ -15,6 +15,7 @@ export function addParticipant(chatId: string, userId: string): Promise<ChatPart
   });
 }
 
-export function getChats(): Promise<Chat[]> {
-  return httpClient<Chat[]>('/chats');
+export function getChats(params?: { userId?: string }): Promise<Chat[]> {
+  const query = params?.userId ? `?userId=${params.userId}` : '';
+  return httpClient<Chat[]>(`/chats${query}`);
 }

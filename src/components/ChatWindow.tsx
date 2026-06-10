@@ -4,7 +4,7 @@ import type { Chat } from '../types/chats.tsx';
 import type { Message } from '../types/messages.tsx';
 import type { User } from '../types/users.tsx';
 import Button from './ui/Button.tsx';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 type ChatWindowProps = {
   selectedUser: User | null;
@@ -15,7 +15,31 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+
+  function handleAttachement(){
+
+  }
+  function formatMessageDate(dateString: string): string {
+    const date = new Date(dateString);
+    const today = new Date();
+    const isToday = date.toDateString() === today.toDateString();
+
+    if (isToday) {
+      return date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    return (
+      date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+      ', ' +
+      date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' })
+    );
+  }
   async function handleSendMessage() {
     if (!selectedChat || messageText.trim() === '') {
       return;
@@ -87,17 +111,25 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
         )}
       </header>
 
-      <section className="flex flex-1 flex-col bg-gray-50 p-8">
+      <section className="flex-1 overflow-y-auto bg-gray-50 p-8">
         {selectedChat ? (
-          <div className="flex flex-1 flex-col gap-4">
-            {messages.map((message) => (
-              <div key={message.id} className="rounded-xl bg-white p-4 shadow">
-                <p>{message.content}</p>
-                <p className="mt-2 text-xs text-gray-400">
-                  {message.sender.name} · {message.createdAt}
-                </p>
-              </div>
-            ))}
+          <div className="flex flex-col gap-4">
+            {[...messages].reverse().map((message) => {
+              const isOwnMessage = message.sender.id === currentUser.id;
+              return (
+                <div key={message.id} className={`flex ${isOwnMessage ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className={`max-w-[70%] rounded-xl p-4 shadow ${isOwnMessage ? 'bg-indigo-500 text-white' : 'bg-white text-gray-900'}`}
+                  >
+                    <p>{message.content}</p>
+                    <p className={`mt-2 text-xs ${isOwnMessage ? 'text-indigo-200' : 'text-gray-400'}`}>
+                      {message.sender.name} · {formatMessageDate(message.createdAt)}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+            <div ref={messagesEndRef} />
           </div>
         ) : (
           <div className="flex flex-1 items-center justify-center">
@@ -114,7 +146,8 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
             value={messageText}
             onChange={(event) => setMessageText(event.target.value)}
           />
-          <Button onClick={handleSendMessage}>Senden</Button>
+          <Button onClick={handleAttachement}>Attach Files</Button>
+          <Button onClick={handleSendMessage}>Send</Button>
         </div>
       </footer>
     </main>
