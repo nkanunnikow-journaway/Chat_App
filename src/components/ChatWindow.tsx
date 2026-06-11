@@ -17,6 +17,7 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
   const [messageText, setMessageText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -148,7 +149,9 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
                         key={attachment.id}
                         src={`${import.meta.env.VITE_API_BASE_URL}${attachment.url}`}
                         alt="attachment"
-                        className="mt-2 max-w-full rounded-lg"
+                        className="mt-2 max-w-[200px] max-h-[200px] rounded-lg object-cover cursor-pointer"
+                        onLoad={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                        onClick={() => setLightboxUrl(`${import.meta.env.VITE_API_BASE_URL}${attachment.url}`)}
                       />
                     ))}
                     <p className={`mt-2 text-xs ${isOwnMessage ? 'text-indigo-200' : 'text-gray-400'}`}>
@@ -191,6 +194,25 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
           <Button onClick={handleSendMessage}>Send</Button>
         </div>
       </footer>
+      {lightboxUrl && (
+        <div
+          className={'fixed inset-0 bg-black/80 flex items-center justify-center z-50'}
+          onClick={() => setLightboxUrl(null)}
+        >
+          <img
+            src={lightboxUrl}
+            alt="Lightbox"
+            className="max-w-[90vw] max-h-[90vh] rounded-xl object-contain"
+            onClick={(event) => event.stopPropagation()}
+          />
+          <button
+            onClick={() => setLightboxUrl(null)}
+            className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/20 text-white hover:bg-white/40 transition"
+          >
+            x
+          </button>
+        </div>
+      )}
     </main>
   );
 }
