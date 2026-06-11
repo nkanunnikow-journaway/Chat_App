@@ -20,12 +20,7 @@ function UsersPage({ currentUser, onLogout }: UsersPageProps) {
     <div className="flex flex-col h-screen overflow-hidden bg-gray-100 text-gray-900">
       <TopBar currentUser={currentUser} onLogout={onLogout} onProfile={handleProfile} />
       <div className="flex flex-1 overflow-hidden">
-        <ChatList
-          currentUser={currentUser}
-          selectedUser={selectedUser}
-          onSelectUser={setSelectedUser}
-          onLogout={onLogout}
-        />
+        <ChatList currentUser={currentUser} selectedUser={selectedUser} onSelectUser={setSelectedUser} />
         <ChatWindow selectedUser={selectedUser} currentUser={currentUser} />
       </div>
     </div>

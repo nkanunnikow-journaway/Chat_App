@@ -1,12 +1,18 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export async function httpClient<TResponse>(path: string, options?: RequestInit): Promise<TResponse> {
+export async function httpClient<TResponse>(
+  path: string,
+  options?: RequestInit,
+  isFormData?: boolean
+): Promise<TResponse> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options?.headers
-    }
+    headers: isFormData
+      ? {}
+      : {
+          'Content-Type': 'application/json',
+          ...options?.headers
+        }
   });
 
   if (!response.ok) {

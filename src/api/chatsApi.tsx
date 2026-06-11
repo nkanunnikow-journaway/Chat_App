@@ -19,3 +19,9 @@ export function getChats(params?: { userId?: string }): Promise<Chat[]> {
   const query = params?.userId ? `?userId=${params.userId}` : '';
   return httpClient<Chat[]>(`/chats${query}`);
 }
+
+export function markChatAsRead(chatId: string, userId: string): Promise<void> {
+  return httpClient<void>(`/chats/${chatId}/read?userId=${userId}`, {
+    method: 'POST'
+  });
+}

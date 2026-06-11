@@ -1,5 +1,5 @@
-import { createChat, getChats } from '../api/chatsApi.tsx';
-import { createMessage, getMessages } from '../api/messagesApi.tsx';
+import { createChat, getChats, markChatAsRead } from '../api/chatsApi.tsx';
+import { createMessage, getMessages, uploadAttachment } from '../api/messagesApi.tsx';
 import type { Chat } from '../types/chats.tsx';
 import type { Message } from '../types/messages.tsx';
 import type { User } from '../types/users.tsx';
@@ -16,15 +16,25 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messageText, setMessageText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  function handleAttachment() {
+    fileInputRef.current?.click();
+  }
+
+  function handleFileSelected(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) {
+      setAttachedFile(file);
+    }
+  }
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-
-  function handleAttachement(){
-
-  }
   function formatMessageDate(dateString: string): string {
     const date = new Date(dateString);
     const today = new Date();
@@ -41,18 +51,27 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
     );
   }
   async function handleSendMessage() {
-    if (!selectedChat || messageText.trim() === '') {
+    if (!selectedChat || (messageText.trim() === '' && !attachedFile)) {
       return;
     }
+
     try {
+      let attachmentIds: string[] = [];
+
+      if (attachedFile) {
+        const attachment = await uploadAttachment(selectedChat.id, attachedFile, currentUser.id);
+        attachmentIds = [attachment.id];
+      }
+
       const createdMessage = await createMessage(selectedChat.id, {
         content: messageText,
         senderId: currentUser.id,
-        attachmentIds: []
+        attachmentIds
       });
 
       setMessages((previousMessages) => [createdMessage, ...previousMessages]);
       setMessageText('');
+      setAttachedFile(null);
     } catch (error) {
       console.error('Nachricht konnte nicht gesendet werden', error);
     }
@@ -80,6 +99,7 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
           setSelectedChat(existingDirectChat);
           const response = await getMessages(existingDirectChat.id);
           setMessages(response.items);
+          await markChatAsRead(existingDirectChat.id, currentUser.id);
           return;
         }
 
@@ -91,6 +111,7 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
         setSelectedChat(createdChat);
         const response = await getMessages(createdChat.id);
         setMessages(response.items);
+        await markChatAsRead(createdChat.id, currentUser.id);
       } catch (error) {
         console.error('Chat konnte nicht geöffnet werden', error);
       }
@@ -122,6 +143,14 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
                     className={`max-w-[70%] rounded-xl p-4 shadow ${isOwnMessage ? 'bg-indigo-500 text-white' : 'bg-white text-gray-900'}`}
                   >
                     <p>{message.content}</p>
+                    {message.attachments.map((attachment) => (
+                      <img
+                        key={attachment.id}
+                        src={`${import.meta.env.VITE_API_BASE_URL}${attachment.url}`}
+                        alt="attachment"
+                        className="mt-2 max-w-full rounded-lg"
+                      />
+                    ))}
                     <p className={`mt-2 text-xs ${isOwnMessage ? 'text-indigo-200' : 'text-gray-400'}`}>
                       {message.sender.name} · {formatMessageDate(message.createdAt)}
                     </p>
@@ -139,6 +168,17 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
       </section>
 
       <footer className="border-t border-gray-200 bg-white p-4">
+        {attachedFile && (
+          <div className="mb-3 relative w-fit">
+            <img src={URL.createObjectURL(attachedFile)} alt="Vorschau" className="h-20 w-20 rounded-xl object-cover" />
+            <button
+              onClick={() => setAttachedFile(null)}
+              className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white text-xs hover:bg-red-600 transition"
+            >
+              ✕
+            </button>
+          </div>
+        )}
         <div className="flex gap-3">
           <input
             className="flex-1 rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-indigo-500"
@@ -146,7 +186,8 @@ function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
             value={messageText}
             onChange={(event) => setMessageText(event.target.value)}
           />
-          <Button onClick={handleAttachement}>Attach Files</Button>
+          <input type="file" accept="image/*" className="hidden" ref={fileInputRef} onChange={handleFileSelected} />
+          <Button onClick={handleAttachment}>Attach</Button>
           <Button onClick={handleSendMessage}>Send</Button>
         </div>
       </footer>
