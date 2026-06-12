@@ -20,5 +20,9 @@ export async function httpClient<TResponse>(
     throw new Error(`API request failed: ${response.status} ${errorText} `);
   }
 
-  return response.json() as Promise<TResponse>;
+  const contentType = response.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return response.json() as Promise<TResponse>;
+  }
+  return undefined as TResponse;
 }

@@ -6,12 +6,21 @@ import { useState, useEffect } from 'react';
 
 type UserListProps = {
   currentUser: User;
-  selectedUser: User | null;
+  selectedChat: Chat | null;
+  onSelectChat: (chat: Chat) => void;
   onSelectUser: (user: User) => void;
   onOpenGroupModal: () => void;
+  groupRefresh: number;
 };
 
-function ChatList({ currentUser, selectedUser, onSelectUser, onOpenGroupModal }: UserListProps) {
+function ChatList({
+  currentUser,
+  selectedChat,
+  onSelectChat,
+  onSelectUser,
+  onOpenGroupModal,
+  groupRefresh
+}: UserListProps) {
   const [chats, setChats] = useState<Chat[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
@@ -19,15 +28,14 @@ function ChatList({ currentUser, selectedUser, onSelectUser, onOpenGroupModal }:
     async function loadChats() {
       try {
         const allChats = await getChats({ userId: currentUser.id });
-        const directChats = allChats.filter((chat) => chat.type === 'DIRECT');
-        setChats(directChats);
+        setChats(allChats.filter((chat) => chat.lastMessage !== null));
       } catch (error) {
         console.error('Chats konnten nicht geladen werden', error);
       }
     }
 
     loadChats();
-  }, [currentUser.id]);
+  }, [currentUser.id, groupRefresh]);
 
   return (
     <aside className="w-80 flex flex-col h-full border-r border-gray-200 bg-white">
@@ -53,13 +61,14 @@ function ChatList({ currentUser, selectedUser, onSelectUser, onOpenGroupModal }:
               }
 
               const otherUser = otherParticipant.user;
-              const isSelected = selectedUser?.id === otherUser.id;
+              const isSelected = selectedChat?.id === chat.id;
+              const displayName = chat.type === 'DIRECT' ? otherUser.name : (chat.name ?? 'Gruppe');
 
               return (
                 <button
                   key={chat.id}
                   onClick={() => {
-                    onSelectUser(otherUser);
+                    onSelectChat(chat);
                     setChats((prev) => prev.map((c) => (c.id === chat.id ? { ...c, unreadCount: 0 } : c)));
                   }}
                   className={`flex w-full items-center gap-3 rounded-2xl p-3 text-left transition ${
@@ -67,12 +76,21 @@ function ChatList({ currentUser, selectedUser, onSelectUser, onOpenGroupModal }:
                   }`}
                 >
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-600 font-bold text-white">
-                    {otherUser.name.charAt(0).toUpperCase()}
+                    {displayName.charAt(0).toUpperCase()}
                   </div>
-
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
-                      <h2 className="truncate font-semibold">{otherUser.name}</h2>
+                      <div className="min-w-0 flex-1">
+                        <h2 className="truncate font-semibold">{displayName}</h2>
+                        {chat.type === 'GROUP' && (
+                          <p className="truncate text-sm text-gray-500">
+                            {chat.participants
+                              .filter((p) => p.userId !== currentUser.id)
+                              .map((p) => p.user.name)
+                              .join(', ')}
+                          </p>
+                        )}
+                      </div>
                       {chat.unreadCount > 0 && (
                         <span className="ml-2 shrink-0 rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
                           {chat.unreadCount}

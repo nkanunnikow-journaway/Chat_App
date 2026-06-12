@@ -25,3 +25,27 @@ export function markChatAsRead(chatId: string, userId: string): Promise<void> {
     method: 'POST'
   });
 }
+
+export function removeParticipant(chatId: string, userId: string): Promise<void> {
+  return httpClient<void>(`/chats/${chatId}/participants/${userId}`, {
+    method: 'DELETE'
+  });
+}
+
+export function updateChatName(chatId: string, name: string): Promise<Chat> {
+  return httpClient<Chat>(`/chats/${chatId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ name })
+  });
+}
+
+export function updateParticipantsRole(
+  chatId: string,
+  userId: string,
+  role: 'MEMBER' | 'ADMIN'
+): Promise<ChatParticipant> {
+  return httpClient<ChatParticipant>(`/chats/${chatId}/participants/${userId}`, {
+    method: 'PATCH',
+    body: JSON.stringify({ role })
+  });
+}

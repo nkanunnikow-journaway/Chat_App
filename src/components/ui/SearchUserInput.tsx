@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 type SearchUserInputProps = {
   onSelectUser: (user: User) => void;
-  onSearchTermChange: (hasSearchTerm: boolean) => void;
+  onSearchTermChange?: (hasSearchTerm: boolean) => void;
 };
 
 function SearchUserInput({ onSelectUser, onSearchTermChange }: SearchUserInputProps) {
@@ -15,7 +15,10 @@ function SearchUserInput({ onSelectUser, onSearchTermChange }: SearchUserInputPr
   async function handleSearch(value: string) {
     const hasSearchTerm = value.trim() !== '';
     setSearchTerm(value);
-    onSearchTermChange(hasSearchTerm);
+    if (onSearchTermChange) {
+      onSearchTermChange(hasSearchTerm);
+    }
+
     setSearchError(false);
 
     if (value.trim() === '') {
@@ -50,6 +53,7 @@ function SearchUserInput({ onSelectUser, onSearchTermChange }: SearchUserInputPr
                 onSelectUser(user);
                 setSearchTerm('');
                 setSearchResults([]);
+                onSearchTermChange?.(false);
               }}
               className={'flex w-full items-center gap-3 rounded-2xl p-3 text-left transition hover:bg-gray-100'}
             >
