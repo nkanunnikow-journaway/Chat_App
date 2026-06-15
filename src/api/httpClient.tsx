@@ -5,24 +5,31 @@ export async function httpClient<TResponse>(
   options?: RequestInit,
   isFormData?: boolean
 ): Promise<TResponse> {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: isFormData
-      ? {}
-      : {
-          'Content-Type': 'application/json',
-          ...options?.headers
-        }
-  });
+  try {
+    const response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers: isFormData
+        ? {}
+        : {
+            'Content-Type': 'application/json',
+            ...options?.headers
+          }
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`API request failed: ${response.status} ${errorText} `);
-  }
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`API request failed: ${response.status} ${errorText} `);
+    }
 
-  const contentType = response.headers.get('content-type');
-  if (contentType && contentType.includes('application/json')) {
-    return response.json() as Promise<TResponse>;
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      return response.json() as Promise<TResponse>;
+    }
+    return undefined as TResponse;
+  } catch (error) {
+    if (error instanceof TypeError && error.message === 'Failed to fetch') {
+      window.dispatchEvent(new CustomEvent('api-unreachable'));
+    }
+    throw error;
   }
-  return undefined as TResponse;
 }

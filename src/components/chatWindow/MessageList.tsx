@@ -58,7 +58,7 @@ function MessageList({
 
   return (
     <>
-      <section className="flex-1 overflow-y-auto bg-bg-chat p-6">
+      <section className="flex-1 overflow-y-auto bg-bg-chat p-6 chat-bg">
         {selectedChat ? (
           <div className="flex flex-col gap-3">
             {hasMore && (
