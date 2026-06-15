@@ -1,6 +1,7 @@
 import { getChats } from '../api/chatsApi.tsx';
 import type { Chat } from '../types/chats.tsx';
 import type { User } from '../types/users.tsx';
+import Avatar from './ui/Avatar.tsx';
 import SearchUserInput from './ui/SearchUserInput.tsx';
 import { useState, useEffect } from 'react';
 
@@ -75,9 +76,10 @@ function ChatList({
                     isSelected ? 'bg-indigo-100' : 'hover:bg-gray-100'
                   }`}
                 >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-600 font-bold text-white">
-                    {displayName.charAt(0).toUpperCase()}
-                  </div>
+                  <Avatar
+                    user={chat.type === 'DIRECT' ? otherUser : { id: chat.id, name: displayName, email: '' }}
+                    size="md"
+                  />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between">
                       <div className="min-w-0 flex-1">

@@ -11,9 +11,10 @@ import { useState } from 'react';
 type UsersPageProps = {
   currentUser: User;
   onLogout: () => void;
+  onProfile: () => void;
 };
 
-function UsersPage({ currentUser, onLogout }: UsersPageProps) {
+function UsersPage({ currentUser, onLogout, onProfile }: UsersPageProps) {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [userArray, setUserArray] = useState<User[]>([]);
   const [groupName, setGroupName] = useState<string>('');
@@ -100,13 +101,9 @@ function UsersPage({ currentUser, onLogout }: UsersPageProps) {
     setUserArray([...userArray, user]);
   }
 
-  function handleProfile() {
-    console.log('Mein Profil');
-  }
-
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-gray-100 text-gray-900">
-      <TopBar currentUser={currentUser} onLogout={onLogout} onProfile={handleProfile} />
+      <TopBar currentUser={currentUser} onLogout={onLogout} onProfile={onProfile} />
       <div className="flex flex-1 overflow-hidden">
         <ChatList
           onOpenGroupModal={handleGroupModal}
