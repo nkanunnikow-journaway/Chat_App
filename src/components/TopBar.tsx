@@ -23,36 +23,36 @@ function TopBar({ currentUser, onLogout, onProfile }: TopBarProps) {
   }, []);
 
   return (
-    <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3 shrink-0">
-      <h1 className="text-lg font-bold text-indigo-600">MyChat</h1>
+    <header className="flex items-center justify-between border-b  bg-bg-sidebar px-6 py-3 shrink-0">
+      <h1 className="text-lg font-bold text-primary">MyChat</h1>
 
       <div className="relative" ref={menuRef}>
         <button
           onClick={() => setMenuOpen((prev) => !prev)}
-          className="flex items-center gap-3 rounded-2xl p-2 transition hover:bg-gray-100"
+          className="flex items-center gap-3 rounded-xl px-3 py-2 transition hover:bg-primary-light"
         >
           <Avatar user={currentUser} size="sm" />
-          <span className="text-sm font-semibold">{currentUser.name}</span>
+          <span className="text-sm font-semibold text-text-main">{currentUser.name}</span>
         </button>
 
         {menuOpen && (
-          <div className="absolute right-0 top-full mt-2 w-48 rounded-2xl border border-gray-200 bg-white shadow-lg z-50">
+          <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border  bg-bg-sidebar shadow-lg z-50">
             <button
               onClick={() => {
                 onProfile();
                 setMenuOpen(false);
               }}
-              className="flex w-full items-center gap-2 rounded-t-2xl px-4 py-3 text-sm transition hover:bg-gray-100"
+              className="flex w-full items-center gap-2 rounded-t-xl px-4 py-3 text-sm text-text-main transition hover:bg-primary-light"
             >
               Mein Profil
             </button>
-            <hr className="border-gray-100" />
+            <hr className="" />
             <button
               onClick={() => {
                 onLogout();
                 setMenuOpen(false);
               }}
-              className="flex w-full items-center gap-2 rounded-b-2xl px-4 py-3 text-sm text-red-500 transition hover:bg-red-50"
+              className="flex w-full items-center gap-2 rounded-b-xl px-4 py-3 text-sm text-red-500 transition hover:bg-red-50"
             >
               Logout
             </button>

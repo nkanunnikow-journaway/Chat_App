@@ -11,7 +11,7 @@ function Button({ children, onClick, disabled }: ButtonProps) {
     <button
       onClick={onClick}
       disabled={disabled}
-      className="rounded-xl bg-indigo-600 px-6 py-3 text-white hover:bg-indigo-700"
+      className="rounded-lg bg-primary px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark transition disabled:opacity-50"
     >
       {children}
     </button>

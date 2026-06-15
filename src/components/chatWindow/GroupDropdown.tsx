@@ -1,7 +1,15 @@
-import { addParticipant, removeParticipant, updateParticipantsRole, updateChatName } from '../../api/chatsApi.tsx';
+import {
+  addParticipant,
+  removeParticipant,
+  updateParticipantsRole,
+  updateChatName,
+  deleteChat
+} from '../../api/chatsApi.tsx';
 import type { Chat } from '../../types/chats.tsx';
 import type { User } from '../../types/users.tsx';
+import Avatar from '../ui/Avatar.tsx';
 import SearchUserInput from '../ui/SearchUserInput.tsx';
+import { Users, UserPlus, Pencil, Trash2, LogOut, Check } from 'lucide-react';
 import { useState } from 'react';
 
 type GroupDropdownProps = {
@@ -10,9 +18,17 @@ type GroupDropdownProps = {
   isAdmin: boolean;
   onChatUpdate: (chat: Chat) => void;
   onLeaveChat: () => void;
+  onDeleteChat: () => void;
 };
 
-function GroupDropdown({ selectedChat, currentUser, isAdmin, onChatUpdate, onLeaveChat }: GroupDropdownProps) {
+function GroupDropdown({
+  selectedChat,
+  currentUser,
+  isAdmin,
+  onChatUpdate,
+  onLeaveChat,
+  onDeleteChat
+}: GroupDropdownProps) {
   const [showMembers, setShowMembers] = useState(false);
   const [showAddMember, setShowAddMember] = useState(false);
   const [showRenameInput, setShowRenameInput] = useState(false);
@@ -29,6 +45,15 @@ function GroupDropdown({ selectedChat, currentUser, isAdmin, onChatUpdate, onLea
       });
     } catch (error) {
       console.error('Rolle konnte nicht geändert werden', error);
+    }
+  }
+
+  async function handleDeleteChat() {
+    try {
+      await deleteChat(selectedChat.id);
+      onDeleteChat();
+    } catch (error) {
+      console.error('Chat konnte nicht gelöscht werden', error);
     }
   }
 
@@ -80,30 +105,29 @@ function GroupDropdown({ selectedChat, currentUser, isAdmin, onChatUpdate, onLea
   }
 
   return (
-    <div className="absolute left-0 top-full mt-2 w-56 rounded-2xl border border-gray-200 bg-white shadow-lg z-50">
+    <div className="absolute left-0 top-full mt-2 w-64 rounded-xl border border-primary-border bg-bg-message-in shadow-lg z-50 overflow-hidden">
       <button
         onClick={() => setShowMembers((prev) => !prev)}
-        className="flex w-full items-center gap-2 rounded-t-2xl px-4 py-3 text-sm hover:bg-gray-100 transition"
+        className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-text-main hover:bg-primary-light transition"
       >
+        <Users size={15} className="text-text-muted" />
         Mitglieder anzeigen
       </button>
       {showMembers && (
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-3 ">
           {selectedChat.participants.map((participant) => (
             <div key={participant.id} className="flex items-center gap-2 py-2">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-600 font-bold text-white text-xs">
-                {participant.user.name.charAt(0).toUpperCase()}
-              </div>
-              <span className="text-sm flex-1">{participant.user.name}</span>
+              <Avatar user={participant.user} size="sm" />
+              <span className="text-sm flex-1 text-text-main">{participant.user.name}</span>
               {participant.userId === currentUser.id ? (
-                <span className="text-xs text-gray-400">Du</span>
+                <span className="text-xs text-text-muted">Du</span>
               ) : isAdmin ? (
                 <div className="flex gap-2">
                   <button
                     onClick={() =>
                       handleUpdateRole(participant.userId, participant.role === 'ADMIN' ? 'MEMBER' : 'ADMIN')
                     }
-                    className="text-xs text-indigo-400 hover:text-indigo-600 transition"
+                    className="text-xs text-primary hover:text-primary-dark transition"
                   >
                     {participant.role === 'ADMIN' ? 'Zu Member' : 'Zu Admin'}
                   </button>
@@ -119,47 +143,62 @@ function GroupDropdown({ selectedChat, currentUser, isAdmin, onChatUpdate, onLea
           ))}
         </div>
       )}
+
       <button
         onClick={() => setShowAddMember((prev) => !prev)}
-        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-gray-100 transition"
+        className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-text-main hover:bg-primary-light transition "
       >
+        <UserPlus size={15} className="text-text-muted" />
         Mitglied hinzufügen
       </button>
       {showAddMember && (
-        <div className="px-4 pb-3">
+        <div className="px-4 pb-3 mt-2">
           <SearchUserInput onSelectUser={handleAddMember} />
         </div>
       )}
+
       <button
         onClick={() => {
           setShowRenameInput((prev) => !prev);
           setNewGroupName(selectedChat.name ?? '');
         }}
-        className="flex w-full items-center gap-2 px-4 py-3 text-sm hover:bg-gray-100 transition"
+        className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-text-main hover:bg-primary-light transition "
       >
+        <Pencil size={15} className="text-text-muted" />
         Gruppenname ändern
       </button>
       {showRenameInput && (
-        <div className="px-4 pb-3 flex gap-2">
+        <div className="px-4 pb-3 mt-2 flex gap-2">
           <input
             type="text"
             value={newGroupName}
             onChange={(e) => setNewGroupName(e.target.value)}
-            className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-indigo-500"
+            className="flex-1 rounded-lg border border-primary-border bg-bg-chat px-3 py-2 text-sm text-text-main outline-none focus:border-primary transition"
           />
           <button
             onClick={handleRenameGroup}
-            className="rounded-xl bg-indigo-600 px-3 py-2 text-sm text-white hover:bg-indigo-700 transition"
+            className="rounded-lg bg-primary px-3 py-2 text-sm text-white hover:bg-primary-dark transition"
           >
-            OK
+            <Check size={16} />
           </button>
         </div>
       )}
-      <hr className="border-gray-100" />
+
+      <hr className="border-primary-border" />
+      {isAdmin && (
+        <button
+          onClick={handleDeleteChat}
+          className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition"
+        >
+          <Trash2 size={15} />
+          Gruppe löschen
+        </button>
+      )}
       <button
         onClick={handleLeaveGroup}
-        className="flex w-full items-center gap-2 rounded-b-2xl px-4 py-3 text-sm text-red-500 hover:bg-red-50 transition"
+        className="flex w-full items-center gap-2 px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 transition"
       >
+        <LogOut size={15} />
         Gruppe verlassen
       </button>
     </div>

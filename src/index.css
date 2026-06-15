@@ -1,8 +1,38 @@
 @import "tailwindcss";
 
-.circle-img {
-    border-radius: 50%;
-    border: 7px solid;
-    width: 120px;
-    height: 120px;
+@theme {
+    --color-primary: #534AB7;
+    --color-primary-light: #EEEDFE;
+    --color-primary-mid: #7F77DD;
+    --color-primary-dark: #3C3489;
+
+    --color-bg-app: #F0EFF8;
+    --color-bg-sidebar: #F8F7FF;
+    --color-bg-chat: #EEEDF8;
+    --color-bg-message-in: #FFFFFF;
+    --color-bg-message-out: #534AB7;
+
+    --color-text-main: #1a1a2e;
+    --color-text-muted: #6b6b8a;
+    --color-text-out: #FFFFFF;
+    --color-text-out-muted: #AFA9EC;
+}
+
+[data-theme="dark"] {
+    --color-primary: #7F77DD;
+    --color-primary-light: #26215C;
+    --color-primary-mid: #AFA9EC;
+    --color-primary-dark: #EEEDFE;
+    --color-primary-border: #2E2A5A;
+
+    --color-bg-app: #1a1a2e;
+    --color-bg-sidebar: #16162a;
+    --color-bg-chat: #1e1e35;
+    --color-bg-message-in: #2a2a45;
+    --color-bg-message-out: #534AB7;
+
+    --color-text-main: #EEEDFE;
+    --color-text-muted: #AFA9EC;
+    --color-text-out: #FFFFFF;
+    --color-text-out-muted: #AFA9EC;
 }

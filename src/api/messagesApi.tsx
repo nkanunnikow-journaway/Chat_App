@@ -1,8 +1,16 @@
 import { CreateMessageRequest, Message, MessageAttachment, MessagesResponse } from '../types/messages';
 import { httpClient } from './httpClient';
 
-export function getMessages(chatId: string): Promise<MessagesResponse> {
-  return httpClient<MessagesResponse>(`/chats/${chatId}/messages`);
+export function getMessages(chatId: string, cursor?: string, limit?: number): Promise<MessagesResponse> {
+  const params = new URLSearchParams();
+  if (cursor) {
+    params.append('cursor', cursor);
+  }
+  if (limit) {
+    params.append('limit', limit.toString());
+  }
+  const query = params.toString() ? `?${params.toString()}` : '';
+  return httpClient<MessagesResponse>(`/chats/${chatId}/messages${query}`);
 }
 
 export function createMessage(chatId: string, request: CreateMessageRequest): Promise<Message> {
@@ -23,4 +31,10 @@ export function uploadAttachment(chatId: string, file: File, uploaderId: string)
     },
     true
   );
+}
+
+export function deleteMessage(chatId: string, messageId: string): Promise<void> {
+  return httpClient<void>(`/chats/${chatId}/messages/${messageId}`, {
+    method: 'DELETE'
+  });
 }

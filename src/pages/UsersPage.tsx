@@ -1,11 +1,10 @@
 import { createChat, getChats } from '../api/chatsApi.tsx';
 import ChatList from '../components/ChatList.tsx';
 import ChatWindow from '../components/ChatWindow.tsx';
-import TopBar from '../components/TopBar.tsx';
-import Button from '../components/ui/Button.tsx';
 import SearchUserInput from '../components/ui/SearchUserInput.tsx';
 import type { Chat } from '../types/chats.tsx';
 import type { User } from '../types/users.tsx';
+import { X } from 'lucide-react';
 import { useState } from 'react';
 
 type UsersPageProps = {
@@ -43,7 +42,6 @@ function UsersPage({ currentUser, onLogout, onProfile }: UsersPageProps) {
       });
       setGroupRefresh((prev) => prev + 1);
       setSubmitted(true);
-
       await new Promise((resolve) => setTimeout(resolve, 1000));
       handleCancel();
     } catch (error) {
@@ -59,6 +57,7 @@ function UsersPage({ currentUser, onLogout, onProfile }: UsersPageProps) {
       setError(null);
     }, 5000);
   }
+
   function handleCancel() {
     setUserArray([]);
     setGroupName('');
@@ -102,8 +101,7 @@ function UsersPage({ currentUser, onLogout, onProfile }: UsersPageProps) {
   }
 
   return (
-    <div className="flex flex-col h-screen overflow-hidden bg-gray-100 text-gray-900">
-      <TopBar currentUser={currentUser} onLogout={onLogout} onProfile={onProfile} />
+    <div className="flex flex-col h-screen overflow-hidden bg-bg-app text-text-main">
       <div className="flex flex-1 overflow-hidden">
         <ChatList
           onOpenGroupModal={handleGroupModal}
@@ -112,6 +110,8 @@ function UsersPage({ currentUser, onLogout, onProfile }: UsersPageProps) {
           onSelectChat={setSelectedChat}
           groupRefresh={groupRefresh}
           onSelectUser={handleSelectUser}
+          onProfile={onProfile}
+          onLogout={onLogout}
         />
         <ChatWindow
           selectedChat={selectedChat}
@@ -122,50 +122,71 @@ function UsersPage({ currentUser, onLogout, onProfile }: UsersPageProps) {
             setGroupRefresh((prev) => prev + 1);
           }}
           onMessageSent={() => setGroupRefresh((prev) => prev + 1)}
+          onDeleteChat={() => {
+            setSelectedChat(null);
+            setGroupRefresh((prev) => prev + 1);
+          }}
         />
       </div>
       {showModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-[500px] max-h-[80vh] overflow-y-auto relative">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+          <div className="bg-bg-message-in rounded-2xl p-6 w-[480px] max-h-[80vh] overflow-y-auto relative border border-primary-border shadow-lg">
+            <h2 className="text-base font-semibold text-text-main mb-4">Neue Gruppe erstellen</h2>
             <SearchUserInput onSelectUser={handleAddUser} />
             <input
               type="text"
-              placeholder="Enter Groupname"
+              placeholder="Gruppenname eingeben"
               value={groupName}
               onChange={(event) => setGroupName(event.target.value)}
-              className={`flex-1 rounded-xl border px-4 py-3 outline-none focus:border-indigo-500 ${
-                submitted && groupName.trim() === '' ? 'border-red-500' : 'border-gray-200'
+              className={`w-full mt-3 rounded-xl border px-4 py-2.5 text-sm text-text-main bg-bg-chat outline-none transition placeholder:text-text-muted ${
+                submitted && groupName.trim() === '' ? 'border-red-400' : 'border-primary-border focus:border-primary'
               }`}
             />
             {submitted && groupName.trim() === '' && (
               <p className="text-red-500 text-xs mt-1">Bitte gib einen Gruppennamen ein.</p>
             )}
-            <ul className="mt-3 flex flex-wrap gap-2 p-2">
+            <ul className="mt-3 flex flex-wrap gap-2">
               {userArray.map((user) => (
-                <li key={user.id} className="flex items-center gap-1 rounded-full bg-indigo-100 px-3 py-1 text-sm">
+                <li
+                  key={user.id}
+                  className="flex items-center gap-1 rounded-full bg-primary-light px-3 py-1 text-xs text-primary-dark"
+                >
                   {user.name}
                   <button
                     onClick={() => setUserArray(userArray.filter((u) => u.id !== user.id))}
-                    className="ml-1 text-indigo-400 hover:text-red-500 transition"
+                    className="ml-1 text-primary hover:text-red-500 transition"
                   >
-                    ✕
+                    <X size={10} />
                   </button>
                 </li>
               ))}
             </ul>
             {submitted && userArray.length === 0 && (
-              <p className="text-red-500 text-xs mt-1">Bitte füge mindestens zwei Teilnehmer hinzu.</p>
+              <p className="text-red-500 text-xs mt-1">Bitte füge mindestens einen Teilnehmer hinzu.</p>
             )}
+            {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
 
             <button
               onClick={() => setShowModal(false)}
-              className="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition"
+              className="absolute top-4 right-4 flex h-7 w-7 items-center justify-center rounded-full bg-bg-chat text-text-muted hover:bg-primary-light transition text-sm"
             >
-              x
+              <X size={14} />
             </button>
-            {error && <p className="text-red-500 mt-2">{error}</p>}
-            <Button onClick={handleCreateGroup}>{isLoading ? 'Loading...' : 'Save'}</Button>
-            <Button onClick={handleCancel}>Cancel</Button>
+
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={handleCreateGroup}
+                className="flex-1 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark transition"
+              >
+                {isLoading ? 'Wird erstellt...' : 'Erstellen'}
+              </button>
+              <button
+                onClick={handleCancel}
+                className="flex-1 rounded-xl border border-primary-border px-4 py-2.5 text-sm font-semibold text-text-muted hover:bg-bg-sidebar transition"
+              >
+                Abbrechen
+              </button>
+            </div>
           </div>
         </div>
       )}

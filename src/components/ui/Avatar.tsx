@@ -18,7 +18,7 @@ function Avatar({ user, size = 'md', overrideUrl }: AvatarProps) {
 
   return (
     <div
-      className={`${sizeClasses[size]} shrink-0 rounded-full overflow-hidden bg-indigo-600 flex items-center justify-center font-bold text-white`}
+      className={`${sizeClasses[size]} shrink-0 rounded-full overflow-hidden bg-primary flex items-center justify-center font-bold text-white`}
     >
       {imageUrl ? (
         <img src={imageUrl} alt={user.name} className="h-full w-full object-cover" />

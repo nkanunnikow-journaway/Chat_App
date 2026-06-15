@@ -1,6 +1,10 @@
 import type { Chat, ChatParticipant, CreateChatRequest } from '../types/chats';
 import { httpClient } from './httpClient';
 
+
+
+
+
 export function createChat(request: CreateChatRequest): Promise<Chat> {
   return httpClient<Chat>('/chats', {
     method: 'POST',
@@ -47,5 +51,11 @@ export function updateParticipantsRole(
   return httpClient<ChatParticipant>(`/chats/${chatId}/participants/${userId}`, {
     method: 'PATCH',
     body: JSON.stringify({ role })
+  });
+}
+
+export function deleteChat(chatId: string): Promise<void> {
+  return httpClient<void>(`/chats/${chatId}`, {
+    method: 'DELETE'
   });
 }
