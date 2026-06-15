@@ -1,4 +1,5 @@
 import type { User } from '../types/users.tsx';
+import Avatar from './ui/Avatar.tsx';
 import { useState, useRef, useEffect } from 'react';
 
 type TopBarProps = {
@@ -30,9 +31,7 @@ function TopBar({ currentUser, onLogout, onProfile }: TopBarProps) {
           onClick={() => setMenuOpen((prev) => !prev)}
           className="flex items-center gap-3 rounded-2xl p-2 transition hover:bg-gray-100"
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-indigo-600 font-bold text-white text-sm">
-            {currentUser.name.charAt(0).toUpperCase()}
-          </div>
+          <Avatar user={currentUser} size="sm" />
           <span className="text-sm font-semibold">{currentUser.name}</span>
         </button>
 

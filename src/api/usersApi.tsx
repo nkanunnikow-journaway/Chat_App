@@ -29,3 +29,28 @@ export function updateUser(id: string, request: UpdateUserRequest): Promise<User
     body: JSON.stringify(request)
   });
 }
+
+export function uploadProfileImage(id: string, file: File): Promise<User> {
+  const formData = new FormData();
+  formData.append('file', file);
+  return httpClient<User>(
+    `/users/${id}/profile-image`,
+    {
+      method: 'POST',
+      body: formData
+    },
+    true
+  );
+}
+
+export function deleteProfileImage(id: string): Promise<User> {
+  return httpClient<User>(`/users/${id}/profile-image`, {
+    method: 'DELETE'
+  });
+}
+
+export function deleteUser(id: string): Promise<User> {
+  return httpClient<User>(`/users/${id}`, {
+    method: 'DELETE'
+  });
+}
