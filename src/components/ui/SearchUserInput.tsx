@@ -28,6 +28,7 @@ function SearchUserInput({ onSelectUser, onSearchTermChange }: SearchUserInputPr
     try {
       const results = await searchUsersByName(value);
       setSearchResults(results);
+      setSearchError(results.length === 0);
     } catch (error) {
       console.error('Fehler beim Suchen', error);
       setSearchError(true);

@@ -28,7 +28,7 @@ function ChatList({
     async function loadChats() {
       try {
         const allChats = await getChats({ userId: currentUser.id });
-        setChats(allChats.filter((chat) => chat.lastMessage !== null));
+        setChats(allChats.filter((chat) => chat.lastMessage !== null || chat.type === 'GROUP'));
       } catch (error) {
         console.error('Chats konnten nicht geladen werden', error);
       }

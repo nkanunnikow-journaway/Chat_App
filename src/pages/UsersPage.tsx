@@ -34,7 +34,7 @@ function UsersPage({ currentUser, onLogout }: UsersPageProps) {
     }
     try {
       setIsLoading(true);
-      const participantIds = [...userArray.map((user) => user.id), currentUser.id];
+      const participantIds = [currentUser.id, ...userArray.map((user) => user.id)];
       await createChat({
         type: 'GROUP',
         name: groupName,
