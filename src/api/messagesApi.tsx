@@ -1,4 +1,4 @@
-import type { CreateMessageRequest, Message, MessagesResponse } from '../types/messages';
+import { CreateMessageRequest, Message, MessageAttachment, MessagesResponse } from '../types/messages';
 import { httpClient } from './httpClient';
 
 export function getMessages(chatId: string): Promise<MessagesResponse> {
@@ -10,4 +10,17 @@ export function createMessage(chatId: string, request: CreateMessageRequest): Pr
     method: 'POST',
     body: JSON.stringify(request)
   });
+}
+
+export function uploadAttachment(chatId: string, file: File, uploaderId: string): Promise<MessageAttachment> {
+  const formData = new FormData();
+  formData.append('file', file);
+  return httpClient<MessageAttachment>(
+    `/chats/${chatId}/attachments?uploaderId=${uploaderId}`,
+    {
+      method: 'POST',
+      body: formData
+    },
+    true
+  );
 }

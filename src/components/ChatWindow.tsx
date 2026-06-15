@@ -1,122 +1,79 @@
-import { createChat, getChats } from '../api/chatsApi.tsx';
-import { createMessage, getMessages } from '../api/messagesApi.tsx';
+import { markChatAsRead } from '../api/chatsApi.tsx';
+import { createMessage, getMessages, uploadAttachment } from '../api/messagesApi.tsx';
 import type { Chat } from '../types/chats.tsx';
 import type { Message } from '../types/messages.tsx';
 import type { User } from '../types/users.tsx';
-import Button from './ui/Button.tsx';
+import ChatHeader from './chatWindow/ChatHeader.tsx';
+import MessageInput from './chatWindow/MessageInput.tsx';
+import MessageList from './chatWindow/MessageList.tsx';
 import { useState, useEffect } from 'react';
 
 type ChatWindowProps = {
-  selectedUser: User | null;
+  selectedChat: Chat | null;
   currentUser: User;
+  onChatUpdate: (chat: Chat) => void;
+  onLeaveChat: () => void;
+  onMessageSent: () => void;
 };
 
-function ChatWindow({ selectedUser, currentUser }: ChatWindowProps) {
-  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+function ChatWindow({ selectedChat, currentUser, onChatUpdate, onLeaveChat, onMessageSent }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [messageText, setMessageText] = useState('');
 
-  async function handleSendMessage() {
-    if (!selectedChat || messageText.trim() === '') {
+  async function handleSendMessage(text: string, file: File | null) {
+    if (!selectedChat || (text.trim() === '' && !file)) {
       return;
     }
     try {
+      let attachmentIds: string[] = [];
+      if (file) {
+        const attachment = await uploadAttachment(selectedChat.id, file, currentUser.id);
+        attachmentIds = [attachment.id];
+      }
       const createdMessage = await createMessage(selectedChat.id, {
-        content: messageText,
+        content: text,
         senderId: currentUser.id,
-        attachmentIds: []
+        attachmentIds
       });
-
       setMessages((previousMessages) => [createdMessage, ...previousMessages]);
-      setMessageText('');
+      onMessageSent();
     } catch (error) {
       console.error('Nachricht konnte nicht gesendet werden', error);
     }
   }
+
   useEffect(() => {
-    if (!selectedUser) {
+    if (!selectedChat) {
       return;
     }
+    const chat = selectedChat;
 
-    const user = selectedUser;
-
-    async function loadChat() {
+    async function loadMessages() {
       try {
-        const allChats = await getChats();
-
-        const existingDirectChat = allChats.find((chat) => {
-          if (chat.type !== 'DIRECT') {
-            return false;
-          }
-          const participantIds = chat.participants.map((p) => p.userId);
-          return participantIds.includes(currentUser.id) && participantIds.includes(user.id);
-        });
-
-        if (existingDirectChat) {
-          setSelectedChat(existingDirectChat);
-          const response = await getMessages(existingDirectChat.id);
-          setMessages(response.items);
-          return;
-        }
-
-        const createdChat = await createChat({
-          type: 'DIRECT',
-          participantIds: [currentUser.id, user.id]
-        });
-
-        setSelectedChat(createdChat);
-        const response = await getMessages(createdChat.id);
+        const response = await getMessages(chat.id);
         setMessages(response.items);
+        await markChatAsRead(chat.id, currentUser.id);
       } catch (error) {
-        console.error('Chat konnte nicht geöffnet werden', error);
+        console.error('Nachrichten konnten nicht geladen werden', error);
       }
     }
 
-    loadChat();
-  }, [selectedUser]);
+    loadMessages();
+  }, [selectedChat]);
+
+  const currentUserParticipant = selectedChat?.participants.find((p) => p.userId === currentUser.id);
+  const isAdmin = currentUserParticipant?.role === 'ADMIN';
+
   return (
     <main className="flex flex-1 flex-col">
-      <header className="flex items-center justify-between border-b border-gray-200 bg-white p-6">
-        {selectedUser ? (
-          <div>
-            <h2 className="text-2xl font-bold">{selectedUser.name}</h2>
-            <p className="text-sm text-gray-500">{selectedUser.email}</p>
-          </div>
-        ) : (
-          <h2 className="text-2xl font-bold">Kein User ausgewählt</h2>
-        )}
-      </header>
-
-      <section className="flex flex-1 flex-col bg-gray-50 p-8">
-        {selectedChat ? (
-          <div className="flex flex-1 flex-col gap-4">
-            {messages.map((message) => (
-              <div key={message.id} className="rounded-xl bg-white p-4 shadow">
-                <p>{message.content}</p>
-                <p className="mt-2 text-xs text-gray-400">
-                  {message.sender.name} · {message.createdAt}
-                </p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-1 items-center justify-center">
-            <p className="text-gray-500">Wähle einen User aus und starte einen Chat.</p>
-          </div>
-        )}
-      </section>
-
-      <footer className="border-t border-gray-200 bg-white p-4">
-        <div className="flex gap-3">
-          <input
-            className="flex-1 rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-indigo-500"
-            placeholder="Nachricht schreiben..."
-            value={messageText}
-            onChange={(event) => setMessageText(event.target.value)}
-          />
-          <Button onClick={handleSendMessage}>Senden</Button>
-        </div>
-      </footer>
+      <ChatHeader
+        selectedChat={selectedChat}
+        currentUser={currentUser}
+        onChatUpdate={onChatUpdate}
+        onLeaveChat={onLeaveChat}
+        isAdmin={isAdmin}
+      />
+      <MessageList messages={messages} selectedChat={selectedChat} currentUser={currentUser} />
+      <MessageInput onSendMessage={handleSendMessage} />
     </main>
   );
 }
