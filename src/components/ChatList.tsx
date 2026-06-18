@@ -5,13 +5,10 @@ import Avatar from './ui/Avatar.tsx';
 import SearchUserInput from './ui/SearchUserInput.tsx';
 import {
   Plus,
-  Settings,
+  UserIcon,
   LogOut,
-  ArrowRightFromLine,
-  ArrowRightSquare,
   Rocket,
   CableCar,
-  CircleArrowRight,
   Handshake,
   Bike,
   PlaneTakeoff,
@@ -20,6 +17,7 @@ import {
   Sun
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type UserListProps = {
   currentUser: User;
@@ -46,19 +44,10 @@ function ChatList({
   const [isSearching, setIsSearching] = useState(false);
   const [logoutHovered, setLogoutHovered] = useState(false);
   const [currentLogoutIcon, setCurrentLogoutIcon] = useState(0);
-  const hoverIcons = [
-    ArrowRightFromLine,
-    ArrowRightSquare,
-    Rocket,
-    CableCar,
-    CircleArrowRight,
-    Handshake,
-    Bike,
-    PlaneTakeoff,
-    Footprints
-  ];
+  const hoverIcons = [Rocket, CableCar, Handshake, Bike, PlaneTakeoff, Footprints];
   const HoverIcon = hoverIcons[currentLogoutIcon];
   const [isDark, setIsDark] = useState(false);
+  const { t, i18n } = useTranslation();
 
   function toggleDarkMode() {
     const newDark = !isDark;
@@ -78,7 +67,7 @@ function ChatList({
         });
         setChats(sorted);
       } catch (error) {
-        console.error('Chats konnten nicht geladen werden', error);
+        console.error('Chats could not be loaded', error);
       }
     }
 
@@ -86,13 +75,13 @@ function ChatList({
   }, [currentUser.id, groupRefresh]);
 
   return (
-    <aside className="w-80 flex flex-col h-full  bg-bg-sidebar">
+    <aside className="w-80 flex flex-col h-full bg-bg-sidebar">
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h1 className="text-base font-semibold text-text-main">Chats</h1>
+          <h1 className="text-base font-semibold text-text-main">{t('chat.title')}</h1>
           <button
             onClick={onOpenGroupModal}
-            title="Neue Gruppe erstellen"
+            title={t('group.new')}
             className="flex items-center justify-center w-7 h-7 rounded-lg bg-primary text-white hover:bg-primary-dark transition text-lg leading-none"
           >
             <Plus size={14} />
@@ -113,7 +102,7 @@ function ChatList({
 
               const otherUser = otherParticipant.user;
               const isSelected = selectedChat?.id === chat.id;
-              const displayName = chat.type === 'DIRECT' ? otherUser.name : (chat.name ?? 'Gruppe');
+              const displayName = chat.type === 'DIRECT' ? otherUser.name : (chat.name ?? t('group.new'));
 
               return (
                 <button
@@ -163,6 +152,7 @@ function ChatList({
               );
             })}
       </div>
+
       <div className="shrink-0 p-3 flex items-center gap-3 bg-bg-sidebar">
         <Avatar user={currentUser} size="sm" />
         <div className="min-w-0 flex-1">
@@ -172,9 +162,9 @@ function ChatList({
         <button
           onClick={onProfile}
           className="text-text-muted hover:text-primary transition p-1.5 rounded-lg hover:bg-primary-light"
-          title="Mein Profil"
+          title={t('profile.title')}
         >
-          <Settings size={18} />
+          <UserIcon size={18} />
         </button>
         <button
           onClick={toggleDarkMode}
@@ -182,6 +172,13 @@ function ChatList({
           className="text-text-muted hover:text-primary transition p-1.5 rounded-lg hover:bg-primary-light"
         >
           {isDark ? <Sun size={16} /> : <Moon size={16} />}
+        </button>
+        <button
+          onClick={() => i18n.changeLanguage(i18n.language === 'de' ? 'en' : 'de')}
+          title={i18n.language === 'de' ? 'Switch to English' : 'Auf Deutsch wechseln'}
+          className="text-text-muted hover:text-primary transition p-1.5 rounded-lg hover:bg-primary-light text-xs font-semibold"
+        >
+          {i18n.language === 'de' ? 'EN' : 'DE'}
         </button>
         <button
           onClick={onLogout}

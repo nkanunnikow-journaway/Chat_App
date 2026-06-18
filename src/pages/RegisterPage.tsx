@@ -2,12 +2,14 @@ import { createUser, getUserByEmail } from '../api/usersApi';
 import type { User } from '../types/users.tsx';
 import confetti from 'canvas-confetti';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type RegisterPageProps = {
   onAuthSuccess: (user: User) => void;
 };
 
 function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
+  const { t } = useTranslation();
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [isLoginMode, setIsLoginMode] = useState(false);
   const [name, setName] = useState('');
@@ -67,19 +69,19 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
       <div className="flex flex-1 flex-col items-center justify-center p-8">
         <div className="w-full max-w-sm">
           <h1 className="text-2xl font-semibold text-text-main mb-2">
-            {isLoginMode ? 'Willkommen zurück' : 'Konto erstellen'}
+            {isLoginMode ? t('auth.welcome_back') : t('auth.create_account')}
           </h1>
           <p className="text-sm text-text-muted mb-8">
-            {isLoginMode ? 'Melde dich mit deiner E-Mail an.' : 'Erstelle ein neues Konto um loszulegen.'}
+            {isLoginMode ? t('auth.sign_in_subtitle') : t('auth.register_subtitle')}
           </p>
 
           <div className="flex flex-col gap-4">
             {!isLoginMode && (
               <div>
-                <label className="text-xs text-text-muted mb-1 block">Name</label>
+                <label className="text-xs text-text-muted mb-1 block">{t('auth.name')}</label>
                 <input
                   className="w-full rounded-lg border border-primary-border bg-bg-message-in px-4 py-2.5 text-sm text-text-main outline-none focus:border-primary transition placeholder:text-text-muted"
-                  placeholder="Dein Name"
+                  placeholder={t('auth.your_name')}
                   value={name}
                   onChange={(event) => setName(event.target.value)}
                   onKeyDown={handleKeyDown}
@@ -88,19 +90,17 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
             )}
 
             <div>
-              <label className="text-xs text-text-muted mb-1 block">E-Mail</label>
+              <label className="text-xs text-text-muted mb-1 block">{t('auth.email')}</label>
               <input
                 className="w-full rounded-lg border border-primary-border bg-bg-message-in px-4 py-2.5 text-sm text-text-main outline-none focus:border-primary transition placeholder:text-text-muted"
-                placeholder="deine@email.de"
+                placeholder={t('auth.your_email')}
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
                 onKeyDown={handleKeyDown}
               />
             </div>
 
-            {status === 'error' && (
-              <p className="text-red-500 text-xs">Etwas ist schiefgelaufen. Bitte versuche es erneut.</p>
-            )}
+            {status === 'error' && <p className="text-red-500 text-xs">{t('auth.error')}</p>}
 
             <button
               onClick={handleSubmit}
@@ -114,9 +114,9 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
                   <div className="h-2 w-2 animate-bounce rounded-full bg-white" />
                 </span>
               ) : isLoginMode ? (
-                'Anmelden'
+                t('auth.sign_in')
               ) : (
-                'Registrieren'
+                t('auth.register')
               )}
             </button>
 
@@ -127,7 +127,7 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
                 setStatus('idle');
               }}
             >
-              {isLoginMode ? 'Noch kein Konto? Jetzt registrieren' : 'Bereits registriert? Anmelden'}
+              {isLoginMode ? t('auth.no_account') : t('auth.already_registered')}
             </button>
           </div>
         </div>

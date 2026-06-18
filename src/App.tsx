@@ -36,11 +36,11 @@ function App() {
       setCurrentUser(null);
       setPage('chat');
     } catch (error) {
-      console.error('Account konnte nicht gelöscht werden', error);
+      console.error('Account could not be deleted', error);
     }
   }
 
-  if (isApiReachable === false) {
+  if (!isApiReachable) {
     return <ErrorPage />;
   }
 

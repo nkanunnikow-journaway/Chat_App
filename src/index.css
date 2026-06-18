@@ -5,6 +5,7 @@
     --color-primary-light: #EEEDFE;
     --color-primary-mid: #7F77DD;
     --color-primary-dark: #3C3489;
+    --color-primary-border: #E2E0F8;
 
     --color-bg-app: #F0EFF8;
     --color-bg-sidebar: #F8F7FF;
@@ -19,10 +20,10 @@
 }
 
 [data-theme="dark"] {
-    --color-primary: #7F77DD;
+    --color-primary: #6259C9;
     --color-primary-light: #26215C;
     --color-primary-mid: #AFA9EC;
-    --color-primary-dark: #EEEDFE;
+    --color-primary-dark: #4A41A8;
     --color-primary-border: #2E2A5A;
 
     --color-bg-app: #1a1a2e;

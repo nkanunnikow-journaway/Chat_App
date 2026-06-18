@@ -1,9 +1,11 @@
+import { deleteChat } from '../../api/chatsApi.tsx';
 import { Chat } from '../../types/chats.tsx';
 import { User } from '../../types/users.tsx';
 import Avatar from '../ui/Avatar.tsx';
 import GroupDropdown from './GroupDropdown.tsx';
-import { ChevronDown, Trash2 } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { MoreVertical, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type ChatHeaderProps = {
   selectedChat: Chat | null;
@@ -15,22 +17,12 @@ type ChatHeaderProps = {
 };
 
 function ChatHeader({ selectedChat, currentUser, onChatUpdate, onLeaveChat, onDeleteChat, isAdmin }: ChatHeaderProps) {
-  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropDownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  const [isDropDownOpen, setIsDropDownOpen] = useState(false);
 
   return (
-    <header className="flex items-center justify-between bg-bg-chat px-6 py-4 shrink-0 ">
+    <header className="flex items-center justify-between bg-bg-chat px-6 py-4 shrink-0">
       {selectedChat ? (
         <>
           <div className="flex items-center gap-3">
@@ -38,7 +30,7 @@ function ChatHeader({ selectedChat, currentUser, onChatUpdate, onLeaveChat, onDe
               user={
                 selectedChat.type === 'DIRECT'
                   ? (selectedChat.participants.find((p) => p.userId !== currentUser.id)?.user ?? currentUser)
-                  : { id: selectedChat.id, name: selectedChat.name ?? 'Gruppe', email: '' }
+                  : { id: selectedChat.id, name: selectedChat.name ?? t('group.new'), email: '' }
               }
               size="md"
             />
@@ -62,12 +54,13 @@ function ChatHeader({ selectedChat, currentUser, onChatUpdate, onLeaveChat, onDe
               )}
             </div>
             {selectedChat.type === 'GROUP' && (
-              <div className="relative" ref={dropdownRef}>
+              <>
                 <button
                   onClick={() => setIsDropDownOpen((prev) => !prev)}
-                  className="text-text-muted text-xs hover:opacity-70 transition ml-1"
+                  title={t('group.manage')}
+                  className="p-1.5 rounded-lg text-text-muted hover:bg-primary-light hover:text-primary transition ml-1"
                 >
-                  <ChevronDown size={18} className={`transition-transform ${isDropDownOpen ? 'rotate-180' : ''}`} />
+                  <MoreVertical size={18} />
                 </button>
                 {isDropDownOpen && (
                   <GroupDropdown
@@ -77,15 +70,16 @@ function ChatHeader({ selectedChat, currentUser, onChatUpdate, onLeaveChat, onDe
                     onChatUpdate={onChatUpdate}
                     onLeaveChat={onLeaveChat}
                     onDeleteChat={onDeleteChat}
+                    onClose={() => setIsDropDownOpen(false)}
                   />
                 )}
-              </div>
+              </>
             )}
           </div>
           {selectedChat.type === 'DIRECT' && (
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              title="Chat löschen"
+              title={t('chat.delete_chat')}
               className="text-text-muted hover:text-red-500 transition text-sm p-2 rounded-lg hover:bg-red-50"
             >
               <Trash2 size={18} />
@@ -93,27 +87,30 @@ function ChatHeader({ selectedChat, currentUser, onChatUpdate, onLeaveChat, onDe
           )}
         </>
       ) : (
-        <h2 className="text-base font-semibold text-text-muted">Kein Chat ausgewählt</h2>
+        <h2 className="text-base font-semibold text-text-muted">{t('chat.no_chat')}</h2>
       )}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-bg-message-in rounded-xl p-6 w-80 flex flex-col gap-4 border border-primary-border">
-            <p className="text-sm font-semibold text-text-main">Chat wirklich löschen?</p>
+            <p className="text-sm font-semibold text-text-main">{t('chat.delete_chat_confirm')}</p>
             <div className="flex gap-2">
               <button
-                onClick={() => {
+                onClick={async () => {
+                  if (selectedChat) {
+                    await deleteChat(selectedChat.id);
+                  }
                   onDeleteChat();
                   setShowDeleteConfirm(false);
                 }}
                 className="flex-1 rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600 transition"
               >
-                Löschen
+                {t('common.delete')}
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 className="flex-1 rounded-lg border border-primary-border px-4 py-2 text-sm font-semibold text-text-muted hover:bg-bg-sidebar transition"
               >
-                Abbrechen
+                {t('common.cancel')}
               </button>
             </div>
           </div>

@@ -1,10 +1,6 @@
 import type { Chat, ChatParticipant, CreateChatRequest } from '../types/chats';
 import { httpClient } from './httpClient';
 
-
-
-
-
 export function createChat(request: CreateChatRequest): Promise<Chat> {
   return httpClient<Chat>('/chats', {
     method: 'POST',

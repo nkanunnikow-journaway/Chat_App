@@ -2,6 +2,7 @@ import { searchUsersByName } from '../../api/usersApi.tsx';
 import { User } from '../../types/users.tsx';
 import { Search } from 'lucide-react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type SearchUserInputProps = {
   onSelectUser: (user: User) => void;
@@ -9,6 +10,7 @@ type SearchUserInputProps = {
 };
 
 function SearchUserInput({ onSelectUser, onSearchTermChange }: SearchUserInputProps) {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<User[]>([]);
   const [searchError, setSearchError] = useState(false);
@@ -31,7 +33,7 @@ function SearchUserInput({ onSelectUser, onSearchTermChange }: SearchUserInputPr
       setSearchResults(results);
       setSearchError(results.length === 0);
     } catch (error) {
-      console.error('Fehler beim Suchen', error);
+      console.error('Search failed', error);
       setSearchError(true);
     }
   }
@@ -42,7 +44,7 @@ function SearchUserInput({ onSelectUser, onSearchTermChange }: SearchUserInputPr
         <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted" />
         <input
           type="text"
-          placeholder="User suchen..."
+          placeholder={t('group.search_placeholder')}
           value={searchTerm}
           onChange={(event) => handleSearch(event.target.value)}
           className="w-full rounded-lg border border-primary-border bg-bg-chat pl-9 pr-4 py-2.5 text-sm text-text-main outline-none focus:border-primary transition placeholder:text-text-muted"
@@ -50,9 +52,9 @@ function SearchUserInput({ onSelectUser, onSearchTermChange }: SearchUserInputPr
       </div>
       {searchTerm.trim() !== '' ? (
         searchError ? (
-          <p className="text-xs text-text-muted text-center mt-3">Kein User gefunden</p>
+          <p className="text-xs text-text-muted text-center mt-3">{t('group.no_user_found')}</p>
         ) : (
-          <div className="mt-1 rounded-lg border border-primary-border bg-bg-message-in overflow-hidden">
+          <div className="mt-1 max-h-44 rounded-lg border border-primary-border bg-bg-message-in overflow-y-auto">
             {searchResults.map((user) => (
               <button
                 key={user.id}
