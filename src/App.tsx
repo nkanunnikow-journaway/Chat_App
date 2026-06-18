@@ -1,14 +1,23 @@
 import { deleteUser } from './api/usersApi';
+import ErrorPage from './pages/ErrorPage.tsx';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
 import UsersPage from './pages/UsersPage';
 import type { User } from './types/users.tsx';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [page, setPage] = useState<'chat' | 'profile'>('chat');
+  const [isApiReachable, setIsApiReachable] = useState<boolean>(true);
 
+  useEffect(() => {
+    function handleApiUnreachable() {
+      setIsApiReachable(false);
+    }
+    window.addEventListener('api-unreachable', handleApiUnreachable);
+    return () => window.removeEventListener('api-unreachable', handleApiUnreachable);
+  }, []);
   function handleAuthSuccess(user: User) {
     setCurrentUser(user);
   }
@@ -27,8 +36,12 @@ function App() {
       setCurrentUser(null);
       setPage('chat');
     } catch (error) {
-      console.error('Account konnte nicht gelöscht werden', error);
+      console.error('Account could not be deleted', error);
     }
+  }
+
+  if (!isApiReachable) {
+    return <ErrorPage />;
   }
 
   if (!currentUser) {

@@ -49,3 +49,9 @@ export function updateParticipantsRole(
     body: JSON.stringify({ role })
   });
 }
+
+export function deleteChat(chatId: string): Promise<void> {
+  return httpClient<void>(`/chats/${chatId}`, {
+    method: 'DELETE'
+  });
+}
