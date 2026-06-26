@@ -49,7 +49,14 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-bg-app">
+    <div className="flex min-h-screen bg-bg-app relative">
+      <div className="absolute inset-0 bg-[url(/login-bg.jpg)] bg-[length:auto_115%] bg-[center_100%] lg:hidden" />
+      <div
+        className="absolute inset-0 lg:hidden"
+        style={{
+          background: 'linear-gradient(to bottom, transparent 15%, var(--color-bg-app) 60%)'
+        }}
+      />
       <div className="hidden lg:block flex-1 relative">
         <div
           className="absolute inset-0"
@@ -66,8 +73,8 @@ function RegisterPage({ onAuthSuccess }: RegisterPageProps) {
           }}
         />
       </div>
-      <div className="flex flex-1 flex-col items-center justify-center p-8">
-        <div className="w-full max-w-sm">
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-end lg:justify-center p-6 sm:p-8">
+        <div className="w-full max-w-sm ">
           <h1 className="text-2xl font-semibold text-text-main mb-2">
             {isLoginMode ? t('auth.welcome_back') : t('auth.create_account')}
           </h1>
