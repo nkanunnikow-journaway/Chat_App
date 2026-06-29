@@ -106,35 +106,40 @@ function UsersPage({ currentUser, onLogout, onProfile }: UsersPageProps) {
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-bg-app text-text-main">
       <div className="flex flex-1 overflow-hidden">
-        <ChatList
-          onOpenGroupModal={handleGroupModal}
-          currentUser={currentUser}
-          selectedChat={selectedChat}
-          onSelectChat={setSelectedChat}
-          groupRefresh={groupRefresh}
-          onSelectUser={handleSelectUser}
-          onProfile={onProfile}
-          onLogout={onLogout}
-        />
-        <ChatWindow
-          selectedChat={selectedChat}
-          currentUser={currentUser}
-          onChatUpdate={setSelectedChat}
-          onLeaveChat={() => {
-            setSelectedChat(null);
-            setGroupRefresh((prev) => prev + 1);
-          }}
-          onMessageSent={() => setGroupRefresh((prev) => prev + 1)}
-          onDeleteChat={() => {
-            setSelectedChat(null);
-            setGroupRefresh((prev) => prev + 1);
-          }}
-        />
+        <div className={`${selectedChat ? 'hidden' : 'flex'} lg:flex w-full lg:w-80 shrink-0`}>
+          <ChatList
+            onOpenGroupModal={handleGroupModal}
+            currentUser={currentUser}
+            selectedChat={selectedChat}
+            onSelectChat={setSelectedChat}
+            groupRefresh={groupRefresh}
+            onSelectUser={handleSelectUser}
+            onProfile={onProfile}
+            onLogout={onLogout}
+          />
+        </div>
+        <div className={`${!selectedChat ? 'hidden' : 'flex'} lg:flex flex-1`}>
+          <ChatWindow
+            selectedChat={selectedChat}
+            currentUser={currentUser}
+            onChatUpdate={setSelectedChat}
+            onLeaveChat={() => {
+              setSelectedChat(null);
+              setGroupRefresh((prev) => prev + 1);
+            }}
+            onMessageSent={() => setGroupRefresh((prev) => prev + 1)}
+            onDeleteChat={() => {
+              setSelectedChat(null);
+              setGroupRefresh((prev) => prev + 1);
+            }}
+            onBackToList={() => setSelectedChat(null)}
+          />
+        </div>
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div className="bg-bg-message-in rounded-2xl p-6 w-[480px] h-[480px] flex flex-col relative border border-primary-border shadow-lg">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+          <div className="bg-bg-message-in rounded-2xl p-6 w-full lg:w-[480px] lg:h-[480px] flex flex-col relative border border-primary-border shadow-lg">
             <h2 className="text-base font-semibold text-text-main mb-4">{t('group.new')}</h2>
             <button
               onClick={() => setShowModal(false)}

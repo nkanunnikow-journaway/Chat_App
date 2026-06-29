@@ -121,7 +121,7 @@ function ProfilePage({ currentUser, onUserUpdate, onDeleteAccount, onBack }: Pro
 
       <main className="flex-1 overflow-y-auto p-8">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-bg-sidebar rounded-2xl border border-primary-light p-8 flex gap-8 relative">
+          <div className="bg-bg-sidebar rounded-2xl border border-primary-light p-8 flex flex-col lg:flex-row gap-8 relative">
             <div className="absolute top-6 right-6" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen((prev) => !prev)}

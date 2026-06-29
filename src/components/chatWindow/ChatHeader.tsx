@@ -3,7 +3,7 @@ import { Chat } from '../../types/chats.tsx';
 import { User } from '../../types/users.tsx';
 import Avatar from '../ui/Avatar.tsx';
 import GroupDropdown from './GroupDropdown.tsx';
-import { MoreVertical, Trash2 } from 'lucide-react';
+import { MoreVertical, Trash2, ArrowLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,9 +14,18 @@ type ChatHeaderProps = {
   onLeaveChat: () => void;
   onDeleteChat: () => void;
   isAdmin: boolean;
+  onBackToList: () => void;
 };
 
-function ChatHeader({ selectedChat, currentUser, onChatUpdate, onLeaveChat, onDeleteChat, isAdmin }: ChatHeaderProps) {
+function ChatHeader({
+  selectedChat,
+  currentUser,
+  onChatUpdate,
+  onLeaveChat,
+  onDeleteChat,
+  isAdmin,
+  onBackToList
+}: ChatHeaderProps) {
   const { t } = useTranslation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isDropDownOpen, setIsDropDownOpen] = useState(false);
@@ -26,6 +35,13 @@ function ChatHeader({ selectedChat, currentUser, onChatUpdate, onLeaveChat, onDe
       {selectedChat ? (
         <>
           <div className="flex items-center gap-3">
+            <button
+              onClick={onBackToList}
+              className="flex lg:hidden p-1.5 rounded-lg text-text-muted hover:bg-primary-light hover:text-primary transition"
+            >
+              <ArrowLeft size={18} />
+            </button>
+
             <Avatar
               user={
                 selectedChat.type === 'DIRECT'

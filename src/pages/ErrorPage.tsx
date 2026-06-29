@@ -34,7 +34,7 @@ function ErrorPage() {
             rel="noopener noreferrer"
             className="flex flex-col rounded-xl border border-primary-border bg-bg-message-in overflow-hidden hover:border-primary transition group"
           >
-            <div className="w-full h-80 bg-bg-sidebar flex items-center justify-center">
+            <div className="w-full h-48 lg:h-80 bg-bg-sidebar flex items-center justify-center">
               <img
                 src="/journaway-preview.jpg"
                 alt="Journaway Preview"

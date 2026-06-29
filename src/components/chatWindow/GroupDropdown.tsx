@@ -134,8 +134,8 @@ function GroupDropdown({
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-        <div className="bg-bg-message-in rounded-2xl border border-primary-light shadow-sm w-[540px] flex flex-col overflow-hidden">
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-bg-message-in rounded-2xl border border-primary-light shadow-sm w-full lg:w-[540px] h-[80vh] lg:h-auto lg:max-h-[80vh] flex flex-col overflow-hidden">
           <div className="px-5 py-3 border-b border-primary-light shrink-0 flex items-center justify-between">
             <div>
               <p className="text-base font-semibold text-text-main truncate">{selectedChat.name ?? t('group.new')}</p>
@@ -151,8 +151,8 @@ function GroupDropdown({
             </button>
           </div>
 
-          <div className="flex h-[380px] overflow-hidden">
-            <div className="w-40 bg-bg-sidebar border-r border-primary-light flex flex-col shrink-0">
+          <div className="flex flex-col lg:flex-row lg:h-[380px] overflow-hidden">
+            <div className="w-full lg:w-40 bg-bg-sidebar border-b lg:border-r border-primary-light flex flex-col shrink-0">
               {(['members', 'add', 'rename'] as Tab[]).map((tab) => (
                 <button
                   key={tab}

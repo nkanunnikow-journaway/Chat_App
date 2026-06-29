@@ -16,6 +16,7 @@ type ChatWindowProps = {
   onLeaveChat: () => void;
   onMessageSent: () => void;
   onDeleteChat: () => void;
+  onBackToList: () => void;
 };
 
 function ChatWindow({
@@ -24,7 +25,8 @@ function ChatWindow({
   onChatUpdate,
   onLeaveChat,
   onMessageSent,
-  onDeleteChat
+  onDeleteChat,
+  onBackToList
 }: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
@@ -134,6 +136,7 @@ function ChatWindow({
         onLeaveChat={onLeaveChat}
         isAdmin={isAdmin}
         onDeleteChat={onDeleteChat}
+        onBackToList={onBackToList}
       />
       <MessageList
         messages={messages}
