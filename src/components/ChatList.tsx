@@ -75,7 +75,7 @@ function ChatList({
   }, [currentUser.id, groupRefresh]);
 
   return (
-    <aside className="w-80 flex flex-col h-full bg-bg-sidebar">
+    <aside className="w-full lg:w-80 flex flex-col h-full bg-bg-sidebar">
       <div className="p-4">
         <div className="flex items-center justify-between mb-3">
           <h1 className="text-base font-semibold text-text-main">{t('chat.title')}</h1>

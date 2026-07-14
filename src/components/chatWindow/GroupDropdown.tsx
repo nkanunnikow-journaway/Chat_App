@@ -314,8 +314,8 @@ function GroupDropdown({
       )}
 
       {showLastAdminWarning && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60]">
-          <div className="bg-bg-message-in rounded-2xl border border-primary-light shadow-sm w-[400px] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[60] p-4">
+          <div className="bg-bg-message-in rounded-2xl border border-primary-light shadow-sm w-full max-w-[400px] flex flex-col overflow-hidden">
             <div className="px-5 py-4 border-b border-primary-light flex items-center justify-between">
               <div>
                 <p className="text-sm font-semibold text-text-main">{t('group.choose_admin')}</p>

@@ -161,8 +161,8 @@ function MessageList({
         </div>
       )}
       {deleteConfirmId && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-bg-message-in rounded-xl p-6 w-80 flex flex-col gap-4 border border-primary-border">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-bg-message-in rounded-xl p-6 w-full max-w-xs flex flex-col gap-4 border border-primary-border">
             <p className="text-sm font-semibold text-text-main">{t('chat.delete_message_confirm')}</p>
             <div className="flex gap-2">
               <button
